@@ -14,21 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.drone.selenium.example.webapp;
+package org.jboss.arquillian.drone.webdriver.configuration;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE;
+/**
+ * Encapsulation of configuration properties shared among all WebDriver types
+ *
+ * @author <a href="kpiwko@redhat.com">Karel Piwko</a>
+ *
+ */
+public interface CommonWebDriverConfiguration extends WebDriverConfigurationType {
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+    /**
+     * Gets class which points to the implementation of the driver
+     *
+     * @return the class
+     */
+    String getImplementationClass();
 
-import javax.inject.Qualifier;
+    /**
+     * Sets class which points to the implementation of the driver
+     *
+     * @param implementationClass the class which implements the driver
+     */
+    void setImplementationClass(String implementationClass);
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({TYPE, METHOD, FIELD, PARAMETER})
-@Qualifier
-public @interface LoggedIn {
 }

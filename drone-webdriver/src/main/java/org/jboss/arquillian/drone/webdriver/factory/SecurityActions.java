@@ -17,6 +17,7 @@
 package org.jboss.arquillian.drone.webdriver.factory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
@@ -94,6 +95,21 @@ final class SecurityActions {
         }
     }
 
+    static Class<?> getClass(final String className) {
+        if (className == null) {
+            throw new IllegalArgumentException("ClassName must be specified");
+        }
+
+        try {
+            final ClassLoader tccl = getThreadContextClassLoader();
+            return Class.forName(className, false, tccl);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("Unable to find implementation class " + className
+                    + " on current classpath. Please make sure it is present on the classpath.");
+        }
+
+    }
+
     /**
      * Create a new instance by finding a constructor that matches the argumentTypes signature using the arguments for
      * instantiation.
@@ -120,12 +136,36 @@ final class SecurityActions {
         }
         final Object obj;
         try {
-            final ClassLoader tccl = getThreadContextClassLoader();
-            final Class<?> implClass = Class.forName(className, false, tccl);
+            final Class<?> implClass = getClass(className);
             Constructor<?> constructor = getConstructor(implClass, argumentTypes);
             obj = constructor.newInstance(arguments);
-        } catch (Exception e) {
-            throw new RuntimeException("Could not create new instance of " + className + ", missing package from classpath?", e);
+        } catch (NoSuchMethodException e) {
+            StringBuilder argNames = new StringBuilder();
+            for (Class<?> arg : argumentTypes) {
+                argNames.append(arg.getSimpleName()).append(", ");
+            }
+            if (argNames.length() > 0) {
+                argNames.deleteCharAt(argNames.length() - 1);
+            }
+            throw new IllegalStateException("Unable to find a proper constructor for implementation class " + className
+                    + " with given parameters (" + argNames.toString()
+                    + "). Please make sure that you haven't misconfigured Arquillian Drone, "
+                    + "e.g. you set an implementationClass which does not match the field/parameter type in your code.");
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("Unable to instantiate a " + className
+                    + ". Please make sure that you haven't misconfigured Arquillian Drone, "
+                    + "e.g. you set an implementationClass which does not match the field/parameter type in your code.", e);
+        } catch (InstantiationException e) {
+            throw new IllegalStateException("Unable to instantiate a " + className
+                    + ". Please make sure that you haven't misconfigured Arquillian Drone, "
+                    + "e.g. you set an implementationClass which does not match the field/parameter type in your code.", e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Unable to instantiate a " + className
+                    + " instance, access refused by SecurityManager.", e);
+        } catch (InvocationTargetException e) {
+            throw new IllegalStateException("Unable to instantiate a " + className
+                    + ". Please make sure that you haven't misconfigured Arquillian Drone, "
+                    + "e.g. you set an implementationClass which does not match the field/parameter type in your code.", e);
         }
 
         // Cast

@@ -17,50 +17,31 @@
 package org.jboss.arquillian.drone.webdriver.configuration;
 
 /**
- * Configuration for Internet Explorer Driver
+ * Configuration for Firefox Driver
  *
  * @author <a href="kpiwko@redhat.com>Karel Piwko</a>
  *
  */
-public class FirefoxDriverConfiguration extends AbstractWebDriverConfiguration<FirefoxDriverConfiguration> {
-
-    private String firefoxProfile;
-
-    private String firefoxBinary;
-
-    /**
-     * Creates a Internet Explorer Driver configuration
-     */
-    public FirefoxDriverConfiguration() {
-        this.implementationClass = "org.openqa.selenium.firefox.FirefoxDriver";
-    }
+public interface FirefoxDriverConfiguration extends CommonWebDriverConfiguration {
 
     /**
      * @return the firefoxProfile
      */
-    public String getFirefoxProfile() {
-        return firefoxProfile;
-    }
+    String getFirefoxProfile();
 
     /**
      * @param firefoxProfile the firefoxProfile to set
      */
-    public void setFirefoxProfile(String firefoxProfile) {
-        this.firefoxProfile = firefoxProfile;
-    }
+    void setFirefoxProfile(String firefoxProfile);
 
     /**
      * @return the firefoxBinary
      */
-    public String getFirefoxBinary() {
-        return firefoxBinary;
-    }
+    String getFirefoxBinary();
 
     /**
      * @param firefoxBinary the firefoxBinary to set
      */
-    public void setFirefoxBinary(String firefoxBinary) {
-        this.firefoxBinary = firefoxBinary;
-    }
+    void setFirefoxBinary(String firefoxBinary);
 
 }
